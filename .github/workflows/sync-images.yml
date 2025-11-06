@@ -23,7 +23,7 @@ jobs:
             --src-no-creds \
             --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
             docker://docker.io/library/openjdk:17-jre-slim \
-            docker://swr.cn-east-3.myhuaweicloud.com/myorg/openjdk:17-jre-slim
+            docker://swr.cn-east-3.myhuaweicloud.com/wzy/openjdk:17-jre-slim
 
       - name: Sync Nginx (example)
         run: |
@@ -31,6 +31,6 @@ jobs:
             --src-no-creds \
             --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
             docker://docker.io/library/nginx:alpine \
-            docker://swr.cn-east-3.myhuaweicloud.com/myorg/nginx:alpine
+            docker://swr.cn-east-3.myhuaweicloud.com/wzy/nginx:alpine
 
       # 👇 在这里添加更多你要的镜像
