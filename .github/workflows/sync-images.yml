@@ -19,11 +19,22 @@ jobs:
 
       - name: Sync OpenJDK 17 JRE Slim
         run: |
-          skopeo copy \
-            --src-no-creds \
-            --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
-            docker://docker.io/library/openjdk:17-jre-slim \
-            docker://swr.cn-east-3.myhuaweicloud.com/wzy/openjdk:17-jre-slim
+          for attempt in {1..3}; do
+            echo "Attempt $attempt..."
+            if skopeo copy \
+              --src-no-creds \
+              --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
+              docker://docker.io/library/openjdk:17-jre-slim-bookworm \
+              docker://swr.cn-east-3.myhuaweicloud.com/wzy/openjdk:17-jre-slim; then
+              echo "✅ Sync succeeded!"
+              exit 0
+            else
+              echo "❌ Attempt $attempt failed. Retrying in 10 seconds..."
+              sleep 10
+            fi
+          done
+          echo "💥 All attempts failed!"
+          exit 1
 
       # - name: Sync Nginx (example)
       #   run: |
