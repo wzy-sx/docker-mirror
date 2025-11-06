@@ -22,7 +22,7 @@ jobs:
           skopeo copy \
             --src-no-creds \
             --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
-            docker://docker.io/library/openjdk:17-jre-slim-bullseye \
+            docker://docker.io/library/openjdk:17-jre-slim-bookworm \
             docker://swr.cn-east-3.myhuaweicloud.com/wzy/openjdk:17-jre-slim-bullseye
 
       # - name: Sync Nginx (example)
