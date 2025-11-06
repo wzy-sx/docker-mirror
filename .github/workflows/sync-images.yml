@@ -1,0 +1,36 @@
+name: Sync Public Images to Huawei SWR
+
+on:
+  # 手动触发（点击 Actions 页面的 "Run workflow"）
+  workflow_dispatch:
+  
+  # 每天 UTC 时间凌晨 2 点自动运行（北京时间 10:00）
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install skopeo
+        run: |
+          sudo apt update
+          sudo apt install -y skopeo
+
+      - name: Sync OpenJDK 17 JRE Slim
+        run: |
+          skopeo copy \
+            --src-no-creds \
+            --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
+            docker://docker.io/library/openjdk:17-jre-slim \
+            docker://swr.cn-east-3.myhuaweicloud.com/myorg/openjdk:17-jre-slim
+
+      - name: Sync Nginx (example)
+        run: |
+          skopeo copy \
+            --src-no-creds \
+            --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
+            docker://docker.io/library/nginx:alpine \
+            docker://swr.cn-east-3.myhuaweicloud.com/myorg/nginx:alpine
+
+      # 👇 在这里添加更多你要的镜像
