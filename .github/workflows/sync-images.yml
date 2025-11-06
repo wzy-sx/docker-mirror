@@ -1,10 +1,7 @@
 name: Sync Public Images to Huawei SWR
 
 on:
-  # 手动触发（点击 Actions 页面的 "Run workflow"）
   workflow_dispatch:
-  
-  # 每天 UTC 时间凌晨 2 点自动运行（北京时间 10:00）
   schedule:
     - cron: '0 2 * * *'
 
@@ -12,36 +9,30 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Install skopeo
+      - name: Set up Docker
         run: |
+          # 安装 Docker（如果需要）
           sudo apt update
-          sudo apt install -y skopeo
+          sudo apt install -y docker.io
+          sudo systemctl start docker
 
-      - name: Sync OpenJDK 17 JRE Slim
+      - name: Login to Huawei Cloud SWR
         run: |
-          for attempt in {1..3}; do
-            echo "Attempt $attempt..."
-            if skopeo copy \
-              --src-no-creds \
-              --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
-              docker://docker.io/eclipse-temurin:17-jre-alpine \
-              docker://swr.cn-east-3.myhuaweicloud.com/wzy/temurin:17-jre-alpine; then
-              echo "✅ Sync succeeded!"
-              exit 0
-            else
-              echo "❌ Attempt $attempt failed. Retrying in 10 seconds..."
-              sleep 10
-            fi
-          done
-          echo "💥 All attempts failed!"
-          exit 1
+          echo "${{ secrets.HW_SK }}" | docker login \
+            -u "${{ secrets.HW_AK }}" \
+            --password-stdin \
+            swr.cn-east-3.myhuaweicloud.com
 
-      # - name: Sync Nginx (example)
-      #   run: |
-      #     skopeo copy \
-      #       --src-no-creds \
-      #       --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
-      #       docker://docker.io/library/nginx:alpine \
-      #       docker://swr.cn-east-3.myhuaweicloud.com/wzy/nginx:alpine
+      - name: Pull, Tag and Push OpenJDK
+        run: |
+          # 拉取公共镜像
+          docker pull eclipse-temurin:17-jre-alpine
 
-      # 👇 在这里添加更多你要的镜像
+          # 打标签
+          docker tag eclipse-temurin:17-jre-alpine \
+            swr.cn-east-3.myhuaweicloud.com/wzy/temurin:17-jre-alpine
+
+          # 推送到 SWR
+          docker push swr.cn-east-3.myhuaweicloud.com/wzy/temurin:17-jre-alpine
+
+      # 可继续添加其他镜像...
