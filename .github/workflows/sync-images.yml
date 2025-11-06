@@ -24,8 +24,8 @@ jobs:
             if skopeo copy \
               --src-no-creds \
               --dest-creds "${{ secrets.HW_AK }}:${{ secrets.HW_SK }}" \
-              docker://docker.io/library/openjdk:17-jre-slim-bookworm \
-              docker://swr.cn-east-3.myhuaweicloud.com/wzy/openjdk:17-jre-slim; then
+              docker://docker.io/eclipse-temurin:17-jre-alpine \
+              docker://swr.cn-east-3.myhuaweicloud.com/wzy/temurin:17-jre-alpine; then
               echo "✅ Sync succeeded!"
               exit 0
             else
